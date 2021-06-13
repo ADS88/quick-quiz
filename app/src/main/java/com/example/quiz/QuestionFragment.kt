@@ -13,16 +13,15 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quiz.databinding.FragmentQuestionBinding
 import com.example.quiz.model.Question
 
 /**
  * A fragment representing a list of Items.
  */
-class QuestionFragment : Fragment() {
+class QuestionFragment : Fragment(R.layout.fragment_question) {
 
-    lateinit var questionEditText: EditText
-    lateinit var answerEditText: EditText
-    lateinit var questionsRemaining : TextView
+    private lateinit var binding : FragmentQuestionBinding
     private val viewModel : SharedViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -30,47 +29,43 @@ class QuestionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val root = inflater.inflate(R.layout.fragment_question, container, false)
-        val recyclerView = root.findViewById<RecyclerView>(R.id.recycler_view)
+        binding = FragmentQuestionBinding.inflate(inflater, container, false)
+        val view = binding.root
 
-        questionEditText = root.findViewById(R.id.question_edit_text)
         viewModel.enteredQuestionText().observe(viewLifecycleOwner, Observer{
-            questionEditText.setText(it)
+            binding.questionEditText.setText(it)
         })
 
-        answerEditText = root.findViewById(R.id.answer_edit_text)
         viewModel.enteredAnswerText().observe(viewLifecycleOwner, Observer{
-            answerEditText.setText(it)
+            binding.answerEditText.setText(it)
         })
 
-        questionsRemaining = root.findViewById(R.id.questions_remaining)
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = QuestionRecyclerViewAdapter(viewModel.questions)
-        recyclerView.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         val numQuestionsRemaining =  4 - viewModel.questions.size
-        questionsRemaining.text = "Enter $numQuestionsRemaining More questions to begin!"
+        binding.questionsRemaining.text = "Enter $numQuestionsRemaining More questions to begin!"
 
-        root.findViewById<Button>(R.id.add_button).setOnClickListener {
-            val question = Question(questionEditText.text.toString(), answerEditText.text.toString())
+        binding.addButton.setOnClickListener {
+            val question = Question(binding.questionEditText.text.toString(), binding.answerEditText.text.toString())
             viewModel.questions.add(question)
             viewModel.clearInputs()
             adapter.setQuestions(viewModel.questions)
             val numQuestionsRemaining =  4 - viewModel.questions.size
-            questionsRemaining.text = "Enter $numQuestionsRemaining More questions to begin!"
+            binding.questionsRemaining.text = "Enter $numQuestionsRemaining More questions to begin!"
             if(numQuestionsRemaining == 0){
                 viewModel.chosenAnswers = viewModel.questions.map{it.answer}.toMutableList().apply{shuffle()}
                 findNavController().navigate(R.id.action_questionFragment_to_gameFragment)
             }
         }
 
-        return root
+        return view
     }
 
     override fun onStop() {
         super.onStop()
-        viewModel.saveInputs(questionEditText.text.toString(), answerEditText.text.toString())
+        viewModel.saveInputs(binding.questionEditText.text.toString(), binding.answerEditText.text.toString())
     }
 
 }

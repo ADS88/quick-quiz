@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import com.example.quiz.databinding.EntryListItemBinding
 
 import com.example.quiz.model.Question
 
@@ -20,15 +21,16 @@ class QuestionRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val question = questions[position]
-        holder.questionTextView.text = question.question
-        holder.answerTextView.text = question.answer
+        with(holder.binding){
+            questionTextView.text = question.question
+            answerTextView.text = question.answer
+        }
     }
 
     override fun getItemCount(): Int = questions.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val questionTextView: TextView = view.findViewById(R.id.question_text_view)
-        val answerTextView: TextView = view.findViewById(R.id.answer_text_view)
+        val binding = EntryListItemBinding.bind(view)
     }
 
     fun setQuestions(newQuestions: List<Question>){

@@ -12,25 +12,27 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.quiz.databinding.FragmentGameBinding
 
 
-class GameFragment : Fragment() {
+class GameFragment : Fragment(R.layout.fragment_game) {
 
+    private lateinit var binding : FragmentGameBinding
     private val viewModel : SharedViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        val root = inflater.inflate(R.layout.fragment_game, container, false)
-        val recyclerView = root.findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.adapter = GameRecyclerViewAdapter(viewModel.questions, viewModel.chosenAnswers)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        root.findViewById<Button>(R.id.check_button).setOnClickListener{
+        binding = FragmentGameBinding.inflate(inflater, container, false)
+
+        binding.recyclerView.adapter = GameRecyclerViewAdapter(viewModel.questions, viewModel.chosenAnswers)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.checkButton.setOnClickListener{
             checkAnswers()
         }
 
-        return root
+        return binding.root
     }
 
     private fun checkAnswers(){
